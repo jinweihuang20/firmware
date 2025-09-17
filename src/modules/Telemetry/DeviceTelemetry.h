@@ -21,6 +21,12 @@ class DeviceTelemetryModule : private concurrency::OSThread, public ProtobufModu
         setIntervalFromNow(setStartDelay()); // Wait until NodeInfo is sent
     }
     virtual bool wantUIFrame() { return false; }
+    meshtastic_Telemetry getDeviceTelemetry();
+    meshtastic_Telemetry getLocalStatsTelemetry();
+    /**
+     * Send our Telemetry into the mesh
+     */
+    bool sendTelemetry(NodeNum dest = NODENUM_BROADCAST, bool phoneOnly = false);
 
   protected:
     /** Called to handle a particular incoming message
@@ -29,10 +35,6 @@ class DeviceTelemetryModule : private concurrency::OSThread, public ProtobufModu
     virtual bool handleReceivedProtobuf(const meshtastic_MeshPacket &mp, meshtastic_Telemetry *p) override;
     virtual meshtastic_MeshPacket *allocReply() override;
     virtual int32_t runOnce() override;
-    /**
-     * Send our Telemetry into the mesh
-     */
-    bool sendTelemetry(NodeNum dest = NODENUM_BROADCAST, bool phoneOnly = false);
 
     /**
      * Get the uptime in seconds
@@ -41,8 +43,6 @@ class DeviceTelemetryModule : private concurrency::OSThread, public ProtobufModu
     uint32_t getUptimeSeconds() { return (0xFFFFFFFF / 1000) * uptimeWrapCount + (uptimeLastMs / 1000); }
 
   private:
-    meshtastic_Telemetry getDeviceTelemetry();
-    meshtastic_Telemetry getLocalStatsTelemetry();
 
     void sendLocalStatsToPhone();
     uint32_t sendToPhoneIntervalMs = SECONDS_IN_MINUTE * 1000;           // Send to phone every minute
