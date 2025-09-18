@@ -53,12 +53,17 @@ ProcessMessage AutoReplyModule::handleReceived(const meshtastic_MeshPacket &mp)
     }
     else if (incoming.find("@dm") != std::string::npos)
     {
+
         LOG_DEBUG("@dm command->Reply device metrics");
-        meshtastic_Telemetry t = deviceTelemetryModule.getDeviceTelemetry();
-        std::string deviceMetricsReplyText = "Device Metrics-> Voltage=" + std::to_string(t.variant.device_metrics.voltage) + "V," +
-                                             "BatLv=" + std::to_string(t.variant.device_metrics.battery_level) + "%," +
-                                             "Channel Util=" + std::to_string(t.variant.device_metrics.channel_utilization) + "%," +
-                                             "Air Util=" + std::to_string(t.variant.device_metrics.air_util_tx) + "%";
+        meshtastic_NodeInfoLite *node = nodeDB->getMeshNode(nodeDB->getNodeNum());
+
+        // meshtastic_Telemetry t = deviceTelemetryModule.getDeviceTelemetry();
+        meshtastic_DeviceMetrics t = node->device_metrics;
+        std::string deviceMetricsReplyText = "Device Metrics-> Voltage=" + std::to_string(t.voltage) + "V," +
+                                             "BatLv=" + std::to_string(t.battery_level) + "%," +
+                                             "Channel Util=" + std::to_string(t.channel_utilization) + "%," +
+                                             "Air Util=" + std::to_string(t.air_util_tx) + "%," +
+                                             "Uptime=" + std::to_string(t.uptime_seconds) + "seconds";
         LOG_DEBUG(deviceMetricsReplyText.c_str());
         replyMessage += deviceMetricsReplyText;
     }
